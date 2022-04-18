@@ -1,0 +1,38 @@
+---
+title: "Week 5 Visualizations Activity"
+author: "Iryna Barvi"
+date: "4/17/2022"
+output: word_document
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(knitr)
+library(bslib)
+library(ggplot2)
+library(data.table)
+```
+
+```{r, include = TRUE}
+# Section 2: Reading the data into R. (5 points)
+airlines <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/airline-safety/airline-safety.csv"
+airline_safety <- read.csv(airlines)
+```
+
+```{r, include = TRUE}
+hist(airline_safety$fatalities_00_14, main= "Total fatalities between 2000 and 2014", xlab = "Fatalities", breaks=4)
+```
+
+```{r, include = TRUE}
+airline_safety$total_incidents = airline_safety$incidents_85_99 + airline_safety$incidents_00_14
+airline_safety$total_seat_km_per_incident = airline_safety$avail_seat_km_per_week / airline_safety$total_incidents
+segdata = data.table(airline_safety)
+
+working_data = segdata[,.(incidents_00_14,avail_seat_km_per_week)]
+
+kmean_output = kmeans(working_data, center=3)
+cluster = kmean_output$cluster
+centers = kmean_output$centers
+qplot(x=avail_seat_km_per_week, y=incidents_00_14, data=working_data,color=factor(cluster)) 
+
+```
